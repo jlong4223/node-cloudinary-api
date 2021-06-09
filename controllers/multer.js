@@ -1,8 +1,9 @@
 const multer = require("multer");
 const path = require("path");
 
+// this function is for assigning the storage location and file name when it is saved
 const imgStorageLoc = multer.diskStorage({
-  // Destination to store image
+  // Destination to store image; this is the images dir
   destination: "images",
   filename: (req, file, cb) => {
     cb(
@@ -14,6 +15,7 @@ const imgStorageLoc = multer.diskStorage({
   },
 });
 
+// this function is for providing size limits and restrictions to file types: .png & .jpg
 const uploadImage = multer({
   storage: imgStorageLoc,
   limits: {
