@@ -1,7 +1,12 @@
 const express = require("express");
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 const logger = require("morgan");
+const Console = require("Console");
+
+/* ----- requiring configurations ---- */
+require("dotenv").config();
+require("./config/cloudinaryConfig");
 
 // importing routes
 const landingRoute = require("./routes/welcome");
@@ -17,5 +22,5 @@ app.use("/", landingRoute);
 app.use("/", imageRoute);
 
 app.listen(port, () =>
-  console.log(`👂🏻 === Server is listening on port ${port}! === 👂🏻`)
+  Console.success(`👂🏻 === Server is listening on port ${port}! === 👂🏻`)
 );
