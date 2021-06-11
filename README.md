@@ -1,6 +1,6 @@
 # Node.js & Multer Image-upload API
 
-This API was created for the purpose of learning how to use multer to upload and save images to a backend server.
+This API was created for the purpose of learning how to use multer as well as cloudinary to upload and save images to a backend server.
 
 ## Tech Used:
 
@@ -9,10 +9,8 @@ This API was created for the purpose of learning how to use multer to upload and
 - Multer
 - Morgan
 - Postman
+- Cloudinary
 
 ## Future Enhancments:
 
-Either use one of the following to save the images:
-
-1. Cloudinary
-2. Amazon s3
+- Refactor cloudinary controller and add route
