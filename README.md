@@ -15,3 +15,5 @@ This API was created for the purpose of learning how to use multer with cloudina
 
 - connect to MongoDB
 - create a users schema with mongoose
+- add testing with mocha & chai
+- add husky for pre-commit hooks
