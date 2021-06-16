@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-
 const imgCtrl = require("../controllers/multer");
 
 // using .single to limit the upload to one picture
+// route saves the images directly to this servers image file
 router.post(
   "/upload",
   imgCtrl.uploadImage.single("image"),
