@@ -1,22 +1,17 @@
 const express = require("express");
 const router = express.Router();
 const multerImgCtrl = require("../controllers/multer");
-const cloudinary = require("../config/cloudinaryConfig");
+const cloudinaryCtrl = require("../controllers/cloudinary");
 
-// TODO send back a response and assign the req.file to the user id in the future
-// bringing in the multer controller and allowing for the upload of a single image
+/* 
+- bringing in the multer controller as middleware and allowing for the upload of a single image
+- multer is the middleware changing the file name, providing restrictions on size and type
+- the image multer provides is then sent to cloudinary 
+*/
 router.post(
   "/cloud",
   multerImgCtrl.uploadImage.single("image"),
-  async (req, res) => {
-    try {
-      // Upload image to cloudinary
-      const result = await cloudinary.uploader.upload(req.file.path);
-      console.log("result: ", result);
-    } catch (err) {
-      console.log("error: ", err);
-    }
-  }
+  cloudinaryCtrl.picUpload
 );
 
 module.exports = router;
