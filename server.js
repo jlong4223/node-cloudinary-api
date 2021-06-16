@@ -11,6 +11,7 @@ require("./config/cloudinaryConfig");
 // importing routes
 const landingRoute = require("./routes/welcome");
 const imageRoute = require("./routes/multer");
+const cloudImgRoute = require("./routes/cloudinary");
 
 // middleware
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use(logger("dev"));
 // using imported routes
 app.use("/", landingRoute);
 app.use("/", imageRoute);
+app.use("/", cloudImgRoute);
 
 app.listen(port, () =>
   Console.success(`👂🏻 === Server is listening on port ${port}! === 👂🏻`)
