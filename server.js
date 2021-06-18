@@ -7,6 +7,7 @@ const Console = require("Console");
 /* ----- requiring configurations ---- */
 require("dotenv").config();
 require("./config/cloudinaryConfig");
+require("./config/dbConfig");
 
 // importing routes
 const landingRoute = require("./routes/welcome");
