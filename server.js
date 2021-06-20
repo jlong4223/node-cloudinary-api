@@ -7,11 +7,13 @@ const Console = require("Console");
 /* ----- requiring configurations ---- */
 require("dotenv").config();
 require("./config/cloudinaryConfig");
+require("./config/dbConfig");
 
 // importing routes
 const landingRoute = require("./routes/welcome");
 const imageRoute = require("./routes/multer");
 const cloudImgRoute = require("./routes/cloudinary");
+const userRoutes = require("./routes/user");
 
 // middleware
 app.use(express.json());
@@ -22,7 +24,8 @@ app.use(logger("dev"));
 app.use("/", landingRoute);
 app.use("/", imageRoute);
 app.use("/", cloudImgRoute);
+app.use("/", userRoutes);
 
 app.listen(port, () =>
-  Console.success(`👂🏻 === Server is listening on port ${port}! === 👂🏻`)
+  Console.success(` 😎 === Server is listening on port ${port}! === 🥳`)
 );
