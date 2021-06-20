@@ -5,7 +5,7 @@ const SECRET = process.env.SECRET;
 const cloudinary = require("../config/cloudinaryConfig");
 
 // TODO send back user with signed JWT
-
+// TODO handle situation when user doesnt sign up with an image
 async function signup(req, res) {
   try {
     /* ----- uploading image to cloudinary; this happens after multer ----- */
