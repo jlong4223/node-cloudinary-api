@@ -3,6 +3,16 @@ const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 6;
 
+const picSchema = new Schema(
+  {
+    image: String,
+    cloudinaryID: String,
+  },
+  {
+    timestamps: true,
+  }
+);
+
 const userSchema = new Schema(
   {
     name: String,
@@ -13,8 +23,7 @@ const userSchema = new Schema(
       unique: true,
     },
     password: String,
-    // BUG figure out how to allow a user to signup without submitting a picture being required
-    picture: String,
+    picture: [picSchema],
   },
   {
     timestamps: true,
