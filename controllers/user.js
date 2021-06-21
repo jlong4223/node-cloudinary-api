@@ -5,17 +5,20 @@ const SECRET = process.env.SECRET;
 const cloudinary = require("../config/cloudinaryConfig");
 
 // TODO send back user with signed JWT
-// TODO handle situation when user doesnt sign up with an image
 async function signup(req, res) {
   try {
     /* ----- uploading image to cloudinary; this happens after multer ----- */
-    const cloudImg = await cloudinary.uploader.upload(req.file.path);
+    // TODO could potentially use lodash get here with default empty string
+    const cloudImg =
+      req.file && req.file.path !== ""
+        ? await cloudinary.uploader.upload(req.file.path)
+        : "";
 
     /* ----- assigning picture object to cloudinary data ----- */
     let { name, email, password } = req.body;
     let picture = {
-      image: cloudImg.secure_url,
-      cloudinaryID: cloudImg.public_id,
+      image: cloudImg.secure_url || "",
+      cloudinaryID: cloudImg.public_id || "",
     };
 
     /* ---- saving the user using schema and assigned variables above ---- */
@@ -34,4 +37,9 @@ async function signup(req, res) {
   }
 }
 
-module.exports = { signup };
+async function getUsers(req, res) {
+  const user = await User.find({});
+  res.json(user);
+}
+
+module.exports = { signup, getUsers };
