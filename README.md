@@ -1,6 +1,6 @@
 # Node.js, Cloudinary & Multer Image-upload API
 
-This API was created for the purpose of learning how to use multer with cloudinary to upload and save images.
+This API was created for the purpose of learning how to use multer with cloudinary to upload and save images. A user can securely sign up and include a profile picture.
 
 ## Tech Used:
 
@@ -10,6 +10,9 @@ This API was created for the purpose of learning how to use multer with cloudina
 - Morgan
 - Postman
 - Cloudinary
+- MongoDB & Mongoose
+- lodash
+- bcrypt
 
 ## Future Enhancments:
 
