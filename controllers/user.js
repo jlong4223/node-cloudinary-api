@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Console = require("Console");
+const get = require("lodash/get");
 const User = require("../models/user");
 const SECRET = process.env.SECRET;
 const cloudinary = require("../config/cloudinaryConfig");
@@ -8,11 +9,9 @@ const cloudinary = require("../config/cloudinaryConfig");
 async function signup(req, res) {
   try {
     /* ----- uploading image to cloudinary; this happens after multer ----- */
-    // TODO could potentially use lodash get here with default empty string
     const cloudImg =
-      req.file && req.file.path !== ""
-        ? await cloudinary.uploader.upload(req.file.path)
-        : "";
+      get(req.file, "path") !== undefined &&
+      (await cloudinary.uploader.upload(req.file.path));
 
     /* ----- assigning picture object to cloudinary data ----- */
     let { name, email, password } = req.body;
