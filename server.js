@@ -6,17 +6,13 @@ const logger = require("morgan");
 const Console = require("Console");
 const map = require("lodash/map");
 
+/* ---- requiring routes ---- */
+const allRoutes = require("./routes/allRoutes");
+
 /* ----- requiring configurations ---- */
 require("dotenv").config();
 require("./config/cloudinaryConfig");
 require("./config/dbConfig");
-
-/* ------ importing routes ------ */
-const landingRoute = require("./routes/welcome");
-const imageRoute = require("./routes/multer");
-const cloudImgRoute = require("./routes/cloudinary");
-const userRoutes = require("./routes/user");
-const allRoutes = [landingRoute, imageRoute, cloudImgRoute, userRoutes];
 
 /* ------ middleware ------ */
 app.use(express.json());
