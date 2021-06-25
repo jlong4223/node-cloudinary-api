@@ -6,7 +6,8 @@ const appCtrl = require("../controllers/multiApp");
 const multerImgCtrl = require("../controllers/multer");
 
 router.get("/allapps/data", appCtrl.showAllMultiAppData);
-router.get("/allapps/data/:userId", appCtrl.getOneMultiAppUser);
+router.get("/allapps/data/:app", appCtrl.getSpecificAppData);
+router.get("/allapps/data/:app/:userId", appCtrl.getSpecificAppUserData);
 
 router.post(
   "/allapps",
