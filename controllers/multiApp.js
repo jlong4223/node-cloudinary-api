@@ -2,6 +2,7 @@
 
 const cloudinary = require("../config/cloudinaryConfig");
 const MultiApp = require("../models/multiFrontend");
+const notFound = require("./shared/notFound");
 const Console = require("Console");
 const get = require("lodash/get");
 
@@ -31,20 +32,42 @@ async function createData(req, res) {
   }
 }
 
-// showing all data which is a combo of applications using this api
+/* == showing all data which is a combo of applications using this api == */
 async function showAllMultiAppData(req, res) {
   const data = await MultiApp.find({});
   res.json(data);
 }
 
-// grabbing user data by the req.params.id, which is the userID sent from frontend and not the mongodb id
-async function getOneMultiAppUser(req, res) {
+/* == narrows down data shown based on app param == */
+async function getSpecificAppData(req, res) {
   try {
-    const data = await MultiApp.find({ userID: req.params.userId });
-    res.json(data);
+    const appData = await MultiApp.find({
+      application: req.params.app,
+    });
+
+    appData.length > 0 ? res.json(appData) : res.json(notFound);
   } catch (err) {
-    console.log("err: ", err);
+    console.log("error", err);
   }
 }
 
-module.exports = { createData, getOneMultiAppUser, showAllMultiAppData };
+/* === allows for the search of a specific user within searched app === */
+async function getSpecificAppUserData(req, res) {
+  try {
+    const appData = await MultiApp.find({
+      application: req.params.app,
+      userID: req.params.userId,
+    });
+
+    appData.length > 0 ? res.json(appData) : res.json(notFound);
+  } catch (err) {
+    console.log("error", err);
+  }
+}
+
+module.exports = {
+  createData,
+  showAllMultiAppData,
+  getSpecificAppData,
+  getSpecificAppUserData,
+};
