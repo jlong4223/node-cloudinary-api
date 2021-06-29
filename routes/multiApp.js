@@ -2,7 +2,7 @@
 
 const express = require("express");
 const router = express.Router();
-const appCtrl = require("../controllers/multiApp");
+const appCtrl = require("../controllers/multiApp/multiApp");
 const multerImgCtrl = require("../controllers/multer");
 
 router.get("/allapps/data", appCtrl.showAllMultiAppData);
