@@ -23,4 +23,7 @@ router.post(
   appCtrl.addToUsersPicData
 );
 
+// this route deletes a user's data and all of their images
+router.delete("/allapps/data/:app/:userId", appCtrl.deleteUserAndPicData);
+
 module.exports = router;
