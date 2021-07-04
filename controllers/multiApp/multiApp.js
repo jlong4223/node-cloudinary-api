@@ -5,6 +5,8 @@ const addToUsersPicData = require("./helpers").addToUsersPicData;
 const createNewUserFromData = require("./helpers").createNewUserFromData;
 const notFound = require("../shared/notFound");
 const Console = require("Console");
+const map = require("lodash/map");
+const cloudinary = require("../../config/cloudinaryConfig");
 
 /* 
 This function will first search for an exisiting user and if there is one, 
@@ -73,10 +75,34 @@ async function getSpecificAppUserData(req, res) {
   }
 }
 
+// TODO delete a specific picture without deleting a user
+
+// *** delete a entire/specific user and all their picture data
+async function deleteUserAndPicData(req, res) {
+  try {
+    const user = await MultiApp.find({
+      application: req.params.app,
+      userID: req.params.userId,
+    });
+
+    // deleting each picture in that the user has saved in cloudinary
+    map(user[0].picture, (eachPic) =>
+      cloudinary.uploader.destroy(eachPic.cloudinaryID)
+    );
+
+    // then deleting the user from mongodb
+    await MultiApp.findByIdAndDelete(user[0]._id);
+    res.json({ user });
+  } catch (err) {
+    console.log("err: ", err);
+  }
+}
+
 module.exports = {
   createData,
   showAllMultiAppData,
   getSpecificAppData,
   getSpecificAppUserData,
   addToUsersPicData,
+  deleteUserAndPicData,
 };
