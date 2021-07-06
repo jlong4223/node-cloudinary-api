@@ -1,5 +1,4 @@
 /*------ This api is used by multiple frontend applications -----*/
-
 const MultiApp = require("../../models/multiFrontend");
 const addToUsersPicData = require("./helpers").addToUsersPicData;
 const createNewUserFromData = require("./helpers").createNewUserFromData;
@@ -75,9 +74,38 @@ async function getSpecificAppUserData(req, res) {
   }
 }
 
-// TODO delete a specific picture without deleting a user
+/* ===================== deletes specific pic data saved to a user =================== */
+async function deleteUserPicData(req, res) {
+  try {
+    await MultiApp.updateOne(
+      {
+        application: req.params.app,
+        userID: req.params.userId,
+      },
+      // using mongoDB $pull to remove image obj
+      // from the picture array, which is deleting the
+      // image that has a cloudinaryID that matches the picId param
+      { $pull: { picture: { cloudinaryID: req.params.picId } } },
+      { upsert: true, new: true, runValidators: true }
+    );
 
-// *** delete a entire/specific user and all their picture data
+    // removing the image from cloudinary
+    await cloudinary.uploader.destroy(req.params.picId);
+
+    res.json({
+      deleted: {
+        status: "success",
+        application: req.params.app,
+        userID: req.params.userId,
+        cloudinaryPicId: req.params.picId,
+      },
+    });
+  } catch (e) {
+    console.log("error: ", e);
+  }
+}
+
+// *** delete a entire/specific user and all their picture data ==================
 async function deleteUserAndPicData(req, res) {
   try {
     const user = await MultiApp.find({
@@ -105,4 +133,5 @@ module.exports = {
   getSpecificAppUserData,
   addToUsersPicData,
   deleteUserAndPicData,
+  deleteUserPicData,
 };
