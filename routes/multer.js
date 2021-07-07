@@ -16,4 +16,16 @@ router.post(
   }
 );
 
+// route that allows multiple (4) images to be uploaded
+router.post(
+  "/uploadmany",
+  imgCtrl.uploadImage.array("image", 4),
+  (req, res) => {
+    res.send(req.files);
+  },
+  (err, req, res, next) => {
+    res.status(400).send({ err: err.message });
+  }
+);
+
 module.exports = router;
