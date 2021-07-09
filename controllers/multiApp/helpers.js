@@ -11,6 +11,8 @@ async function createNewUserFromData(req, res) {
   );
 
   try {
+    // TODO need to refactor this to a map so a new user can create saved data w/multiple pics
+    // BUG - doesnt work bc multer is sending array of req.files and not req.file anymore
     const cloudImg =
       get(req.file, "path") !== undefined &&
       (await cloudinary.uploader.upload(req.file.path));
@@ -35,6 +37,7 @@ async function createNewUserFromData(req, res) {
   }
 }
 
+// TODO no longer using this function but need to move the usersInfo and console stuff to the multi controller
 /* --------- allowing a user to post/save more pictures to their pictures array -------- */
 async function addToUsersPicData(req, res, usersInfo) {
   try {

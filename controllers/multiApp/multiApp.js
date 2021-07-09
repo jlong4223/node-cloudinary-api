@@ -1,6 +1,6 @@
 /*------ This api is used by multiple frontend applications -----*/
 const MultiApp = require("../../models/multiFrontend");
-const addToUsersPicData = require("./helpers").addToUsersPicData;
+const addMultiplePicsToUser = require("./helpers").addMultiplePicsToUser;
 const createNewUserFromData = require("./helpers").createNewUserFromData;
 const notFound = require("../shared/notFound");
 const Console = require("Console");
@@ -17,6 +17,7 @@ async function createData(req, res) {
   // looking for any user data in the request
   let { userID, application } = req.body;
 
+  // TODO look into assigning this once and providing to other functions instead of reasigning multiple times for each function here
   const user = await MultiApp.find({
     application,
     userID,
@@ -32,10 +33,10 @@ async function createData(req, res) {
         application: user[0].application,
       };
 
-      addToUsersPicData(req, res, usersInfo);
+      addMultiplePicsToUser(req, res, usersInfo);
       break;
 
-    // if there is not user data, creates new user and saves first picture
+    // BUG doesnt work anymore if there is not user data, creates new user and saves first picture
     default:
       createNewUserFromData(req, res);
   }
@@ -126,42 +127,11 @@ async function deleteUserAndPicData(req, res) {
   }
 }
 
-// TODO use this in place of the current addToUsersPicData() helper
-// this should be the function for users to add pics to their array; this one works for one or more pics being uploaded
-async function addMultiplePicsToUser(req, res, usersInfo) {
-  try {
-    const user = await MultiApp.find({
-      application: req.params.app,
-      userID: req.params.userId,
-    });
-    const pics = req.files;
-
-    map(pics, async (eachPic) => {
-      const cloudPic = await cloudinary.uploader.upload(eachPic.path);
-
-      const picture = {
-        image: cloudPic.secure_url,
-        cloudinaryID: cloudPic.public_id,
-      };
-
-      // adding the pictures to the users picture array
-      user[0].picture.push(picture);
-      user[0].save();
-    });
-
-    res.status(200).json({ user });
-  } catch (err) {
-    console.log("err: ", err);
-    res.status(500).json({ err });
-  }
-}
-
 module.exports = {
   createData,
   showAllMultiAppData,
   getSpecificAppData,
   getSpecificAppUserData,
-  addToUsersPicData,
   addMultiplePicsToUser,
   deleteUserAndPicData,
   deleteUserPicData,
