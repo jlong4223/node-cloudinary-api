@@ -3,7 +3,7 @@ const landingRoute = require("./welcome");
 const imageRoute = require("./multer");
 const cloudImgRoute = require("./cloudinary");
 const userRoutes = require("./user");
-const multiAppRoutes = require("./multiApp");
+const multiAppRoutes = require("./multiApp/multiApp");
 
 const allRoutes = [
   landingRoute,
