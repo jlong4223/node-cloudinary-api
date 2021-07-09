@@ -1,6 +1,6 @@
 /*------ This api is used by multiple frontend applications -----*/
 const MultiApp = require("../../models/multiFrontend");
-const addMultiplePicsToUser = require("./helpers").addMultiplePicsToUser;
+const addToUsersPicData = require("./helpers").addMultiplePicsToUser;
 const createNewUserFromData = require("./helpers").createNewUserFromData;
 const notFound = require("../shared/notFound");
 const Console = require("Console");
@@ -124,6 +124,41 @@ async function deleteUserAndPicData(req, res) {
     res.json({ user });
   } catch (err) {
     console.log("err: ", err);
+  }
+}
+
+// function for users to add pics to their array; this one works for one or more pics being uploaded
+async function addMultiplePicsToUser(req, res, usersInfo) {
+  try {
+    Console.debug(
+      `>>> the req user from users param is ${
+        usersInfo.userID || req.params.userId
+      } from ${usersInfo.application || req.params.app}`
+    );
+
+    const user = await MultiApp.find({
+      application: req.params.app || usersInfo.application,
+      userID: req.params.userId || usersInfo.userID,
+    });
+    const pics = req.files;
+
+    map(pics, async (eachPic) => {
+      const cloudPic = await cloudinary.uploader.upload(eachPic.path);
+
+      const picture = {
+        image: cloudPic.secure_url || "",
+        cloudinaryID: cloudPic.public_id || "",
+      };
+
+      // adding the pictures to the users picture array
+      user[0].picture.push(picture);
+      user[0].save();
+    });
+
+    res.status(200).json({ user });
+  } catch (err) {
+    console.log("err: ", err);
+    res.status(500).json({ err });
   }
 }
 
