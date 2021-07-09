@@ -16,11 +16,19 @@ router.post(
   appCtrl.createData
 );
 
+// TODO remove this appCtrl function and replace it with addMultiplePicsToUser()
 // this route allows for a user to add additional pictures to their data
 router.post(
   "/allapps/data/:app/:userId",
   multerImgCtrl.uploadImage.single("image"),
   appCtrl.addToUsersPicData
+);
+
+// this route allows a user to add multiple pictures to their data
+router.post(
+  "/allapps/data/:app/:userId/multi",
+  multerImgCtrl.uploadImage.array("image", 5),
+  appCtrl.addMultiplePicsToUser
 );
 
 // this route deletes a user's data and all of their images
