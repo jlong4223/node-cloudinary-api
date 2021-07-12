@@ -2,39 +2,48 @@ const MultiApp = require("../../models/multiFrontend");
 const cloudinary = require("../../config/cloudinaryConfig");
 const Console = require("Console");
 const get = require("lodash/get");
+const map = require("lodash/map");
 
 module.exports = { createNewUserFromData, addToUsersPicData };
 
+// this allows a user to create data w/1 or more images
 async function createNewUserFromData(req, res) {
   Console.debug(
     "** User in createData(req) is not in the DB, so one is being created ** "
   );
 
   try {
-    const cloudImg =
-      get(req.file, "path") !== undefined &&
-      (await cloudinary.uploader.upload(req.file.path));
-
-    let { userID, application } = req.body;
-    let picture = {
-      image: cloudImg.secure_url || "",
-      cloudinaryID: cloudImg.public_id || "",
-    };
-
+    const { userID, application } = req.body;
+    const pics = req.files;
     const appData = new MultiApp({
       userID,
       application,
-      picture,
     });
 
     await appData.save();
-    res.json({ appData });
+    // ==== after it saves the user, it adds the pictures to the user data
+    const user = await MultiApp.find(appData);
+
+    map(pics, async (eachPic) => {
+      const cloudPic = await cloudinary.uploader.upload(eachPic.path);
+
+      const picture = {
+        image: cloudPic.secure_url || "",
+        cloudinaryID: cloudPic.public_id || "",
+      };
+
+      // adding the pictures to the users picture array
+      user[0].picture.push(picture);
+      await user[0].save();
+    });
+    res.status(200).json({ user });
   } catch (err) {
     Console.error("err: ", err);
     res.status(400).json(err);
   }
 }
 
+// TODO no longer using this function; only allows one initial pic upload
 /* --------- allowing a user to post/save more pictures to their pictures array -------- */
 async function addToUsersPicData(req, res, usersInfo) {
   try {

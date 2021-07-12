@@ -1,6 +1,6 @@
 /*------ This api is used by multiple frontend applications -----*/
 const MultiApp = require("../../models/multiFrontend");
-const addToUsersPicData = require("./helpers").addToUsersPicData;
+const addToUsersPicData = require("./helpers").addMultiplePicsToUser;
 const createNewUserFromData = require("./helpers").createNewUserFromData;
 const notFound = require("../shared/notFound");
 const Console = require("Console");
@@ -17,6 +17,7 @@ async function createData(req, res) {
   // looking for any user data in the request
   let { userID, application } = req.body;
 
+  // TODO look into assigning this once and providing to other functions instead of reasigning multiple times for each function here
   const user = await MultiApp.find({
     application,
     userID,
@@ -32,10 +33,10 @@ async function createData(req, res) {
         application: user[0].application,
       };
 
-      addToUsersPicData(req, res, usersInfo);
+      addMultiplePicsToUser(req, res, usersInfo);
       break;
 
-    // if there is not user data, creates new user and saves first picture
+    // BUG doesnt work anymore if there is not user data, creates new user and saves first picture
     default:
       createNewUserFromData(req, res);
   }
@@ -54,7 +55,7 @@ async function getSpecificAppData(req, res) {
       application: req.params.app,
     });
 
-    appData.length > 0 ? res.json(appData) : res.json(notFound);
+    appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
     console.log("error", err);
   }
@@ -68,7 +69,7 @@ async function getSpecificAppUserData(req, res) {
       userID: req.params.userId,
     });
 
-    appData.length > 0 ? res.json(appData) : res.json(notFound);
+    appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
     console.log("error", err);
   }
@@ -113,6 +114,9 @@ async function deleteUserAndPicData(req, res) {
       userID: req.params.userId,
     });
 
+    // no user found, sends back 404
+    !user[0] && res.status(404).json(notFound);
+
     // deleting each picture in that the user has saved in cloudinary
     map(user[0].picture, (eachPic) =>
       cloudinary.uploader.destroy(eachPic.cloudinaryID)
@@ -126,13 +130,18 @@ async function deleteUserAndPicData(req, res) {
   }
 }
 
-// TODO use this in place of the current addToUsersPicData() helper
-// this should be the function for users to add pics to their array; this one works for one or more pics being uploaded
+// function for users to add pics to their array; this one works for one or more pics being uploaded
 async function addMultiplePicsToUser(req, res, usersInfo) {
   try {
+    Console.debug(
+      `>>> the req user from users param is ${
+        usersInfo.userID || req.params.userId
+      } from ${usersInfo.application || req.params.app}`
+    );
+
     const user = await MultiApp.find({
-      application: req.params.app,
-      userID: req.params.userId,
+      application: req.params.app || usersInfo.application,
+      userID: req.params.userId || usersInfo.userID,
     });
     const pics = req.files;
 
@@ -140,8 +149,8 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
       const cloudPic = await cloudinary.uploader.upload(eachPic.path);
 
       const picture = {
-        image: cloudPic.secure_url,
-        cloudinaryID: cloudPic.public_id,
+        image: cloudPic.secure_url || "",
+        cloudinaryID: cloudPic.public_id || "",
       };
 
       // adding the pictures to the users picture array
@@ -161,7 +170,6 @@ module.exports = {
   showAllMultiAppData,
   getSpecificAppData,
   getSpecificAppUserData,
-  addToUsersPicData,
   addMultiplePicsToUser,
   deleteUserAndPicData,
   deleteUserPicData,
