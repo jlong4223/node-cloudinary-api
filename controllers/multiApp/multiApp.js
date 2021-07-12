@@ -55,7 +55,7 @@ async function getSpecificAppData(req, res) {
       application: req.params.app,
     });
 
-    appData.length > 0 ? res.json(appData) : res.json(notFound);
+    appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
     console.log("error", err);
   }
@@ -69,7 +69,7 @@ async function getSpecificAppUserData(req, res) {
       userID: req.params.userId,
     });
 
-    appData.length > 0 ? res.json(appData) : res.json(notFound);
+    appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
     console.log("error", err);
   }
@@ -113,6 +113,9 @@ async function deleteUserAndPicData(req, res) {
       application: req.params.app,
       userID: req.params.userId,
     });
+
+    // no user found, sends back 404
+    !user[0] && res.status(404).json(notFound);
 
     // deleting each picture in that the user has saved in cloudinary
     map(user[0].picture, (eachPic) =>
