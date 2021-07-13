@@ -1,11 +1,12 @@
 /*------ This api is used by multiple frontend applications -----*/
 const MultiApp = require("../../models/multiFrontend");
-const addToUsersPicData = require("./helpers").addMultiplePicsToUser;
-const createNewUserFromData = require("./helpers").createNewUserFromData;
 const notFound = require("../shared/notFound");
 const Console = require("Console");
 const map = require("lodash/map");
 const cloudinary = require("../../config/cloudinaryConfig");
+
+/* ------ helpers ------ */
+const { createNewUserFromData, getApp, getUser } = require("./helpers");
 
 /* 
 This function will first search for an exisiting user and if there is one, 
@@ -15,13 +16,7 @@ create a new user and save their first picture
 */
 async function createData(req, res) {
   // looking for any user data in the request
-  let { userID, application } = req.body;
-
-  // TODO look into assigning this once and providing to other functions instead of reasigning multiple times for each function here
-  const user = await MultiApp.find({
-    application,
-    userID,
-  });
+  const user = await getUser(req, res);
 
   Console.debug("-> The createData() req user is in the database: ", !!user[0]);
 
@@ -36,7 +31,6 @@ async function createData(req, res) {
       addMultiplePicsToUser(req, res, usersInfo);
       break;
 
-    // BUG doesnt work anymore if there is not user data, creates new user and saves first picture
     default:
       createNewUserFromData(req, res);
   }
@@ -51,9 +45,7 @@ async function showAllMultiAppData(req, res) {
 /* ========= narrows down data shown based on app param ========= */
 async function getSpecificAppData(req, res) {
   try {
-    const appData = await MultiApp.find({
-      application: req.params.app,
-    });
+    const appData = await getApp(req, res);
 
     appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
@@ -64,10 +56,7 @@ async function getSpecificAppData(req, res) {
 /* ========= allows for the search of a specific user within searched app ========= */
 async function getSpecificAppUserData(req, res) {
   try {
-    const appData = await MultiApp.find({
-      application: req.params.app,
-      userID: req.params.userId,
-    });
+    const appData = await getUser(req, res);
 
     appData.length > 0 ? res.json(appData) : res.status(404).json(notFound);
   } catch (err) {
@@ -78,6 +67,16 @@ async function getSpecificAppUserData(req, res) {
 /* ===================== deletes specific pic data saved to a user =================== */
 async function deleteUserPicData(req, res) {
   try {
+    // const user = await getUser(req, res);
+    const picId = req.params.picId;
+
+    // BUG figure out why this saves the pic to a diff obj in mongo when deleted
+    // await MultiApp.updateOne(
+    //   user,
+    //   { $pull: { picture: { cloudinaryID: picId } } },
+    //   { strict: false, upsert: true, new: true, runValidators: true }
+    // );
+
     await MultiApp.updateOne(
       {
         application: req.params.app,
@@ -91,14 +90,14 @@ async function deleteUserPicData(req, res) {
     );
 
     // removing the image from cloudinary
-    await cloudinary.uploader.destroy(req.params.picId);
+    await cloudinary.uploader.destroy(picId);
 
     res.json({
       deleted: {
         status: "success",
         application: req.params.app,
         userID: req.params.userId,
-        cloudinaryPicId: req.params.picId,
+        cloudinaryPicId: picId,
       },
     });
   } catch (e) {
@@ -109,10 +108,7 @@ async function deleteUserPicData(req, res) {
 // *** delete a entire/specific user and all their picture data ==================
 async function deleteUserAndPicData(req, res) {
   try {
-    const user = await MultiApp.find({
-      application: req.params.app,
-      userID: req.params.userId,
-    });
+    const user = await getUser(req, res);
 
     // no user found, sends back 404
     !user[0] && res.status(404).json(notFound);
@@ -139,10 +135,7 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
       } from ${usersInfo.application || req.params.app}`
     );
 
-    const user = await MultiApp.find({
-      application: req.params.app || usersInfo.application,
-      userID: req.params.userId || usersInfo.userID,
-    });
+    const user = await getUser(req, res, usersInfo);
     const pics = req.files;
 
     map(pics, async (eachPic) => {
