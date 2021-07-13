@@ -2,18 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 6;
-// const picSchema = require("./picModel");
-
-// TODO figure out how to require this instead of duplicating in other files
-const picSchema = new Schema(
-  {
-    image: String,
-    cloudinaryID: String,
-  },
-  {
-    timestamps: true,
-  }
-);
+const picModelSchema = require("./picModel").schema;
 
 const userSchema = new Schema(
   {
@@ -25,7 +14,7 @@ const userSchema = new Schema(
       unique: true,
     },
     password: String,
-    picture: [picSchema],
+    picture: [picModelSchema],
   },
   {
     timestamps: true,
