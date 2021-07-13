@@ -4,7 +4,27 @@ const Console = require("Console");
 const get = require("lodash/get");
 const map = require("lodash/map");
 
-module.exports = { createNewUserFromData, addToUsersPicData };
+module.exports = { createNewUserFromData, getUser, getApp };
+
+// ------- functions with no routes associated to them but used by ctrls ------- //
+async function getUser(req, res, usersInfo) {
+  let application =
+    req.params.app || req.body.application || usersInfo.application;
+  let userID = req.params.userId || req.body.userID || usersInfo.userID;
+
+  const user = await MultiApp.find({
+    application,
+    userID,
+  });
+
+  return user;
+}
+
+async function getApp(req, res) {
+  return await MultiApp.find({
+    application: req.params.app,
+  });
+}
 
 // this allows a user to create data w/1 or more images
 async function createNewUserFromData(req, res) {
@@ -40,43 +60,5 @@ async function createNewUserFromData(req, res) {
   } catch (err) {
     Console.error("err: ", err);
     res.status(400).json(err);
-  }
-}
-
-// TODO no longer using this function; only allows one initial pic upload
-/* --------- allowing a user to post/save more pictures to their pictures array -------- */
-async function addToUsersPicData(req, res, usersInfo) {
-  try {
-    Console.debug(
-      `>>> the req user from users param is ${usersInfo.userID} from ${usersInfo.application}`
-    );
-
-    /* this function either takes route params or 
-      user data that is forwarded through this functions usersInfo param
-      from the createData switch/case to find user information
-    */
-    const user = await MultiApp.find(
-      {
-        application: req.params.app || usersInfo.application,
-        userID: req.params.userId || usersInfo.userID,
-      },
-      async () => {
-        let newPic =
-          get(req.file, "path") !== undefined &&
-          (await cloudinary.uploader.upload(req.file.path));
-
-        let picture = {
-          image: newPic.secure_url || "",
-          cloudinaryID: newPic.public_id || "",
-        };
-
-        user[0].picture.push(picture);
-        user[0].save();
-
-        res.json(user[0]);
-      }
-    );
-  } catch (err) {
-    console.log("error in adding to users pic: ", err);
   }
 }
