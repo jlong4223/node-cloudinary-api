@@ -1,7 +1,6 @@
 const MultiApp = require("../../models/multiFrontend");
 const cloudinary = require("../../config/cloudinaryConfig");
 const Console = require("Console");
-const get = require("lodash/get");
 const map = require("lodash/map");
 
 module.exports = { createNewUserFromData, getUser, getApp };
@@ -33,7 +32,7 @@ async function createNewUserFromData(req, res) {
   );
 
   try {
-    const { userID, application } = req.body;
+    const { userID, application, isProfilePic } = req.body;
     const pics = req.files;
     const appData = new MultiApp({
       userID,
@@ -50,6 +49,7 @@ async function createNewUserFromData(req, res) {
       const picture = {
         image: cloudPic.secure_url || "",
         cloudinaryID: cloudPic.public_id || "",
+        isProfilePic,
       };
 
       // adding the pictures to the users picture array

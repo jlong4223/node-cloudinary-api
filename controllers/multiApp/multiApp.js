@@ -144,6 +144,7 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
       const picture = {
         image: cloudPic.secure_url || "",
         cloudinaryID: cloudPic.public_id || "",
+        isProfilePic: req.body.isProfilePic || null,
       };
 
       // adding the pictures to the users picture array
@@ -157,6 +158,8 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
     res.status(500).json({ err });
   }
 }
+
+// TODO have a function that allows user to edit pic, specifically changing the isProfilePic
 
 module.exports = {
   createData,
