@@ -5,6 +5,7 @@ const picSchema = new Schema(
   {
     image: String,
     cloudinaryID: String,
+    isProfilePic: Boolean,
   },
   {
     timestamps: true,
