@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const bcrypt = require("bcrypt");
 const SALT_ROUNDS = 6;
-const picModelSchema = require("./picModel").schema;
+const picModelSchema = require("./subSchemas/picModel").schema;
 
 const userSchema = new Schema(
   {

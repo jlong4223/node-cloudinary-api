@@ -15,6 +15,7 @@ const {
   addMultiplePicsToUser,
   deleteUserAndPicData,
   deleteUserPicData,
+  editUserProfilePic,
 } = controllers;
 
 // ------------------------- destructuring route params ------------------------- //
@@ -28,6 +29,9 @@ const multerUploadMiddleware = multerImgCtrl.uploadImage.array("image", 5);
 router.get(allApps, showAllMultiAppData);
 router.get(app, getSpecificAppData);
 router.get(appUser, getSpecificAppUserData);
+
+// ======= allows a user to update profilePic boolean
+router.patch(userPic, editUserProfilePic);
 
 // ======= creates user data and first image(s) or saves pics to a found user from the request
 router.post(allApps, multerUploadMiddleware, createData);
