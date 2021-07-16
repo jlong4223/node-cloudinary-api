@@ -144,7 +144,7 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
       const picture = {
         image: cloudPic.secure_url || "",
         cloudinaryID: cloudPic.public_id || "",
-        isProfilePic: req.body.isProfilePic || null,
+        isProfilePic: req.body.isProfilePic || false,
       };
 
       // adding the pictures to the users picture array
@@ -159,7 +159,28 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
   }
 }
 
-// TODO have a function that allows user to edit pic, specifically changing the isProfilePic
+// function that allows a user to update a pictures isProfilePic value
+const editUserProfilePic = async (req, res) => {
+  try {
+    const user = await getUser(req, res);
+
+    // grabbing user by id, picture by _id(mongo one) from params
+    // updating the picture found with the req.body
+    // which should include isProfilePic: Boolean
+    const updateUserProfilePic = await MultiApp.updateOne(
+      { _id: user[0]._id, picture: { $elemMatch: { _id: req.params.picId } } },
+      { $set: { "picture.$.isProfilePic": req.body.isProfilePic } }
+    );
+
+    user[0].save();
+    res.status(200).json({ updateUserProfilePic });
+  } catch (err) {
+    console.log("error: ", err);
+  }
+};
+
+// TODO figure out if there is a way to set all other pictures isProfilePic to false when one is set to true -
+// this could be a frontend function; when a user changes their profile pic, it runs this controller twice: 1-to update current profile pic to false and then 2-update profile pic being chosen
 
 module.exports = {
   createData,
@@ -169,4 +190,5 @@ module.exports = {
   addMultiplePicsToUser,
   deleteUserAndPicData,
   deleteUserPicData,
+  editUserProfilePic,
 };
