@@ -148,11 +148,10 @@ async function addMultiplePicsToUser(req, res, usersInfo) {
       };
 
       // adding the pictures to the users picture array
-      user[0].picture.push(picture);
-      user[0].save();
+      await user[0].picture.push(picture);
+      await user[0].save();
+      res.status(200).json({ user });
     });
-
-    res.status(200).json({ user });
   } catch (err) {
     console.log("err: ", err);
     res.status(500).json({ err });
